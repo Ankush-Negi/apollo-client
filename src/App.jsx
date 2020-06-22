@@ -16,8 +16,7 @@ function App() {
   return (
     <SnackBarProvider>
       <ApolloProvider client={client}>
-        <Router >
-          {/* history={history} */}
+        <Router>
           <Switch>
             <Route exact path="/">
               <Redirect to="/login" />

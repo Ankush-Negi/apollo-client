@@ -126,8 +126,9 @@ const TableComponent = (props) => {
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow key={id}>
-              {column.length && column.map((col) => (
+              {column.length && column.map((col, index) => (
                 <TableCell
+                  key={`key_${index + 1}`}
                   align={col.align}
                   className={classes.color}
                 >

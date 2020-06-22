@@ -80,15 +80,12 @@ class LoginPage extends React.Component {
     try {
       const { email, password } = await this.state;
       const { history } = await this.props;
-      console.log('value of history', this.props);
       const response = await loginUser({ variables: { email, password } });
       const { data: { loginUser: token } } = await response;
-      console.log('value of token', token);
-      await ls.set('token', token);
-      await history.push('/trainee');
+      ls.set('token', token);
+      history.push('/trainee');
       await this.toggler();
     } catch (error) {
-      console.log('This is the value of error', error);
       this.toggler();
       openSnackBar('This is an Error!', 'error');
     }
@@ -179,7 +176,7 @@ class LoginPage extends React.Component {
             <Grid item xs={12} className={classes.grid}>
               <TextField
                 label="Password"
-                type="password"
+                // type="password"
                 variant="outlined"
                 fullWidth
                 InputProps={{

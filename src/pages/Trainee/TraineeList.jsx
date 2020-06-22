@@ -2,18 +2,19 @@ import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import propTypes from 'prop-types';
+import { graphql } from '@apollo/react-hoc';
+import Compose from 'lodash.flowright';
 import * as moment from 'moment';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
-import ls from 'local-storage';
+import { GET_TRAINEE } from './query';
 import {
   AddDialog, EditDialog, RemoveDialog,
 } from './components';
 import { TableComponent } from '../../components/Table';
-import callApi from '../../lib/utils/api';
 import { MyContext } from '../../contexts';
 
-const useStyles = {
+const style = {
 
   button: {
     display: 'flex',
@@ -32,12 +33,6 @@ class TraineeList extends React.Component {
       removeOpen: false,
       rowData: {},
       rowsPerPage: 20,
-      tableData: [],
-      message: '',
-      status: '',
-      count: 0,
-      loader: true,
-      tableDataLength: 0,
     };
   }
 
@@ -52,42 +47,34 @@ handleClose = () => {
 onSubmitHandle = (values) => {
   this.setState({ open: false, editOpen: false });
   const { page, rowsPerPage } = this.state;
-  this.handleTableData({
-    params: { skip: page * rowsPerPage, limit: rowsPerPage },
-    headers: { Authorization: ls.get('token') },
-  }, '/trainee', 'Get');
+  const {
+    data: {
+      getAllTrainee: {
+        count = 0,
+      } = {},
+      refetch,
+    },
+  } = this.props;
+  refetch({ skip: page * rowsPerPage, limit: rowsPerPage });
   console.log(values);
 }
 
 handleOnSubmitDelete = (values) => {
-  this.setState({ open: false, removeOpen: false, loader: true });
-  const { page, rowsPerPage, count } = this.state;
-  console.log(values);
-  if (count - page * rowsPerPage !== 1) {
-    this.handleTableData({
-      params: {
-        skip: page * rowsPerPage,
-        limit: rowsPerPage,
-      },
-      headers: { Authorization: ls.get('token') },
-    }, '/trainee', 'Get');
-  } else if (page !== 0) {
-    this.setState({ page: page - 1 });
-    this.handleTableData({
-      params: {
-        skip: (page - 1) * rowsPerPage,
-        limit: rowsPerPage,
-      },
-      headers: { Authorization: ls.get('token') },
-    }, '/trainee', 'Get');
-  } else {
-    this.handleTableData({
-      params: {
-        skip: (page) * rowsPerPage,
-        limit: rowsPerPage,
-      },
-      headers: { Authorization: ls.get('token') },
-    }, '/trainee', 'Get');
+  this.setState({ open: false, removeOpen: false });
+  const { page, rowsPerPage } = this.state;
+  const {
+    data: {
+      getAllTrainee: {
+        count = 0,
+      } = {},
+      refetch,
+    },
+  } = this.props;
+  if (count - page * rowsPerPage === 1 && page > 0) {
+    this.setState({ page: page - 1 }, () => {
+      const { page: updatePage } = this.state;
+      refetch({ skip: updatePage, limit: rowsPerPage });
+    });
   }
   console.log(values);
 }
@@ -114,59 +101,28 @@ handleRemoveDialogOpen = (values) => {
   this.setState({ removeOpen: true, rowData: values });
 }
 
-handleChangePage = (event, newPage) => {
-  const { rowsPerPage, message, status } = this.state;
-  const { openSnackBar } = this.context;
-  return status === 'ok' ? (this.setState({ page: newPage, loader: true }),
-  this.handleTableData({
-    params: {
-      skip: newPage * rowsPerPage,
-      limit: rowsPerPage,
-    },
-    headers: { Authorization: ls.get('token') },
-  }, '/trainee', 'Get'))
-    : (openSnackBar(message, status));
+handleChangePage = (refetch) => (event, newPage) => {
+  const { rowsPerPage } = this.state;
+  refetch({ skip: newPage * rowsPerPage, limit: rowsPerPage });
+  this.setState({ page: newPage });
+  console.log('-----------', { skip: newPage * rowsPerPage, limit: rowsPerPage });
 };
 
-handleTableData = (data, url, method) => {
-  callApi(data, url, method).then((response) => {
-    const { records, count } = response.data;
-    this.setState({
-      tableData: records,
-      loader: false,
-      tableDataLength: records.length,
-      count,
-    });
-  });
-}
-
-componentDidMount = async () => {
-  await callApi({
-    params: {
-      skip: 0, limit: 20,
-    },
-    headers: { authorization: ls.get('token') },
-  },
-  '/trainee',
-  'Get').then((response) => {
-    const { status, message, data } = response;
-    const { records, count } = data;
-    this.setState({
-      tableData: records,
-      tableDataLength: records.length,
-      message,
-      status,
-      count,
-      loader: false,
-    });
-  });
-}
-
 render() {
-  const { classes } = this.props;
+  const {
+    data: {
+      getAllTrainee: {
+        records = [],
+        count = 0,
+      } = {},
+      loading,
+      refetch,
+    },
+    match: { url }, classes,
+  } = this.props;
   const {
     open, order, orderBy, page, editOpen, rowData, removeOpen,
-    rowsPerPage, tableData, count, loader, tableDataLength,
+    rowsPerPage,
   } = this.state;
   const getDateFormatted = (date) => moment(date).format('dddd,MMMM Do YYYY, h:mm:ss a');
   return (
@@ -180,7 +136,7 @@ render() {
       <TableComponent
 
         id={page}
-        data={tableData}
+        data={records}
         column={[{
           field: 'name',
           label: 'Name',
@@ -214,11 +170,10 @@ render() {
         onSelect={this.handleSelectChange}
         count={count}
         page={page}
-        onChangePage={this.handleChangePage}
+        onChangePage={this.handleChangePage(refetch)}
         rowsPerPage={rowsPerPage}
-        loader={loader}
-        dataLength={tableDataLength}
-
+        loader={loading}
+        dataLength={count}
       />
       <EditDialog
         open={editOpen}
@@ -236,9 +191,16 @@ render() {
   );
 }
 }
-export default withStyles(useStyles, { withTheme: true })(TraineeList);
-TraineeList.propTypes = {
-  classes: propTypes.objectOf(propTypes.any).isRequired,
-};
 
 TraineeList.contextType = MyContext;
+
+TraineeList.propTypes = {
+  match: propTypes.objectOf(propTypes.any).isRequired,
+  classes: propTypes.objectOf(propTypes.string).isRequired,
+  data: propTypes.objectOf(propTypes.any).isRequired,
+};
+
+export default Compose(withStyles(style, { withTheme: true }),
+  graphql(GET_TRAINEE, {
+    options: { variables: { skip: 0, limit: 20 } },
+  }))(TraineeList);

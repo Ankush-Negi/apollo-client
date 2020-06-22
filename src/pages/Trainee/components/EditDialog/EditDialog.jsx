@@ -177,7 +177,7 @@ class EditDialog extends React.Component {
             <MyContext.Consumer>
               {(value) => (
                 <>
-                  <Button disabled={!isValid} onClick={() => { onSubmit({ name, email, originalId }); this.formReset(); value.openSnackBar('This is a success message ! ', 'success'); }} color="primary">
+                  <Button disabled={!isValid} onClick={() => { this.handleFormCallApi({ name, email, originalId }); onSubmit({ name, email, originalId }); this.formReset(); value.openSnackBar('This is a success message ! ', 'success'); }} color="primary">
                     <span>{loader ? <CircularProgress size={20} /> : '' }</span>
               Submit
                   </Button>

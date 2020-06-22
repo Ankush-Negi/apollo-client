@@ -7,7 +7,7 @@ const Wrapper = (props) => (
   <Mutation mutation={LOGIN_USER}>
     {(loginUser) => (
       <>
-        <Login loginUser={loginUser} {...props}/>
+        <Login loginUser={loginUser} {...props} />
       </>
     )}
   </Mutation>
