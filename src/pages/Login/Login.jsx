@@ -70,25 +70,33 @@ class LoginPage extends React.Component {
   };
 
   toggler = async () => {
-    await this.setState((prevState) => ({
-      loader: !prevState.loader,
-      isValid: !prevState.isValid,
-    }));
+    await this.setState({
+      loader: true,
+      isValid: false,
+    });
   }
 
   handleLoader = async (loginUser, openSnackBar) => {
     try {
-      const { email, password } = await this.state;
-      const { history } = await this.props;
+      const { email, password } = this.state;
+      const { history } = this.props;
       const response = await loginUser({ variables: { email, password } });
-      const { data: { loginUser: token } } = await response;
+      const { data: { loginUser: token } } = response;
       ls.set('token', token);
+      this.toggler();
       history.push('/trainee');
-      await this.toggler();
     } catch (error) {
       this.toggler();
       openSnackBar('This is an Error!', 'error');
     }
+  }
+
+  disableHandler = () => {
+    const { isValid } = this.state;
+    if (isValid) {
+      return false;
+    }
+    return true;
   }
 
   hasError = (field) => {
@@ -141,7 +149,6 @@ class LoginPage extends React.Component {
   render = () => {
     const { classes, loginUser } = this.props;
     const {
-      isValid,
       loader,
     } = this.state;
     return (
@@ -198,11 +205,10 @@ class LoginPage extends React.Component {
                   type="submit"
                   fullWidth
                   variant="contained"
-                  disabled={!isValid}
+                  disabled={this.disableHandler() ? true : false}
                   color="primary"
                   className={classes.submit}
-                  onClick={async () => {
-                    this.setState({ loader: true, isValid: false });
+                  onClick={() => {
                     this.handleLoader(loginUser, value.openSnackBar);
                   }}
                 >
@@ -220,12 +226,8 @@ class LoginPage extends React.Component {
 
 LoginPage.propTypes = {
   classes: PropTypes.objectOf(PropTypes.string).isRequired,
-  history: PropTypes.object,
+  history: PropTypes.objectOf(PropTypes.any).isRequired,
   loginUser: PropTypes.func.isRequired,
-};
-
-LoginPage.defaultProps = {
-  history: undefined,
 };
 
 export default withStyles(styles)(LoginPage);

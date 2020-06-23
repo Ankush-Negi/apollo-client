@@ -13,8 +13,6 @@ import PersonIcon from '@material-ui/icons/Person';
 import EmailIcon from '@material-ui/icons/Email';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import ls from 'local-storage';
-import callApi from '../../../../lib/utils/api';
 import { MyContext } from '../../../../contexts';
 import ValidationSchema from './helper';
 
@@ -97,20 +95,18 @@ class AddDialog extends React.Component {
     this.setState({ touch });
   };
 
-  callApiHandler= (value) => {
-    const { name, email, password } = value;
+  toggler = () => {
+    this.setState((prevState) => ({
+      loader: !prevState.loader,
+      isValid: !prevState.isValid,
+    }));
+  }
+
+  handleSubmit = async (data) => {
     const { onSubmit } = this.props;
-    this.setState({ loader: true, isValid: false });
-    callApi({ data: { name, email, password }, headers: { Authorization: ls.get('token') } },
-      '/trainee', 'post').then((data) => {
-      const { status, message } = data;
-      const { context } = this;
-      const { openSnackBar } = context;
-      this.setState({ isValid: false });
-      onSubmit({ name, email, password });
-      if (status === 'ok') openSnackBar(message, 'success');
-    });
-  };
+    await onSubmit(data);
+    this.toggler();
+  }
 
   render = () => {
     const {
@@ -221,10 +217,11 @@ class AddDialog extends React.Component {
             <Button
               variant="contained"
               disabled={isValid}
-              onClick={() => {
-                this.callApiHandler({ name, email, password });
-              }}
               color="primary"
+              onClick={() => {
+                this.handleSubmit({ name, email, password });
+                this.toggler();
+              }}
             >
               <span>{loader ? <CircularProgress size={20} /> : ''}</span>
               Submit
