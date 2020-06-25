@@ -1,7 +1,6 @@
 import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
@@ -13,16 +12,18 @@ import PropTypes from 'prop-types';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ls from 'local-storage';
-// import callApi from '../../lib/utils/api';
 import { MyContext } from '../../contexts';
 import LoginValidationSchema from './helper';
 
 const styles = () => ({
+  root: {
+    margin: '5px 0 20px 0',
+  },
   container: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: 100,
+    marginTop: 80,
   },
   paper: {
     display: 'flex',
@@ -35,13 +36,13 @@ const styles = () => ({
   },
   avatar: {
     margin: 20,
-    backgroundColor: 'red',
+    backgroundColor: '#0e30d8',
   },
   submit: {
-    marginTop: 50,
+    padding: '8px',
   },
   grid: {
-    padding: 10,
+    padding: '10px 0 10px 0',
   },
 });
 
@@ -77,26 +78,18 @@ class LoginPage extends React.Component {
   }
 
   handleLoader = async (loginUser, openSnackBar) => {
+    this.toggler();
     try {
       const { email, password } = this.state;
       const { history } = this.props;
       const response = await loginUser({ variables: { email, password } });
       const { data: { loginUser: token } } = response;
       ls.set('token', token);
-      this.toggler();
       history.push('/trainee');
     } catch (error) {
       this.toggler();
       openSnackBar('This is an Error!', 'error');
     }
-  }
-
-  disableHandler = () => {
-    const { isValid } = this.state;
-    if (isValid) {
-      return false;
-    }
-    return true;
   }
 
   hasError = (field) => {
@@ -150,16 +143,16 @@ class LoginPage extends React.Component {
     const { classes, loginUser } = this.props;
     const {
       loader,
+      isValid,
     } = this.state;
     return (
       <div>
-        <CssBaseline />
         <Grid container className={classes.container}>
           <div className={classes.paper}>
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>
-            <Typography component="h1" variant="h5">
+            <Typography component="h3" variant="h5">
             Login
             </Typography>
             <Grid item xs={12} className={classes.grid}>
@@ -174,7 +167,7 @@ class LoginPage extends React.Component {
                     </InputAdornment>
                   ),
                 }}
-                error={this.getError('Email') ? true : false}
+                error={!!this.getError('Email')}
                 helperText={this.getError('Email')}
                 onChange={this.handleEmailChange}
                 onBlur={() => this.isTouched('Email')}
@@ -183,7 +176,7 @@ class LoginPage extends React.Component {
             <Grid item xs={12} className={classes.grid}>
               <TextField
                 label="Password"
-                // type="password"
+                type="password"
                 variant="outlined"
                 fullWidth
                 InputProps={{
@@ -193,7 +186,7 @@ class LoginPage extends React.Component {
                     </InputAdornment>
                   ),
                 }}
-                error={this.getError('Password') ? true : false}
+                error={!!this.getError('Password')}
                 helperText={this.getError('Password')}
                 onChange={this.handlePasswordChange}
                 onBlur={() => this.isTouched('Password')}
@@ -202,13 +195,13 @@ class LoginPage extends React.Component {
             <MyContext.Consumer>
               {(value) => (
                 <Button
+                  className={classes.submit}
                   type="submit"
                   fullWidth
                   variant="contained"
-                  disabled={this.disableHandler() ? true : false}
+                  disabled={!isValid}
                   color="primary"
-                  className={classes.submit}
-                  onClick={() => {
+                  onClick={async () => {
                     this.handleLoader(loginUser, value.openSnackBar);
                   }}
                 >

@@ -10,6 +10,7 @@ import ls from 'local-storage';
 const useStyles = makeStyles({
   root: {
     flexGrow: 1,
+    margin: '10 10 10 0',
   },
   title: {
     flexGrow: 1,
@@ -18,7 +19,7 @@ const useStyles = makeStyles({
   {
     fontSize: '1rem',
   },
-  padding: {
+  marginButton: {
     marginRight: 30,
   },
 });
@@ -40,7 +41,7 @@ export default function Navbar() {
             <Button className={classes.textSize} component={Link} to="/trainee" size="small" color="inherit">Trainee</Button>
             <Button className={classes.textSize} component={Link} to="/text-field-demo" size="small" color="inherit">TextField Demo</Button>
             <Button className={classes.textSize} component={Link} to="/input-demo" size="small" color="inherit">Input Demo</Button>
-            <Button className={`${classes.textSize} ${classes.padding}`} component={Link} to="/children-demo" size="small" color="inherit">Children Demo</Button>
+            <Button className={`${classes.textSize} ${classes.marginButton}`} component={Link} to="/children-demo" size="small" color="inherit">Children Demo</Button>
             <Button className={classes.textSize} component={Link} to="/login" onClick={logout} size="small" color="inherit">Logout</Button>
           </Typography>
         </Toolbar>

@@ -9,6 +9,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Mutation } from '@apollo/react-components';
 import { CREATE_TRAINEE, UPDATE_TRAINEE, DELETE_TRAINEE } from './mutation';
+import { UPDATE_TRAINEE_SUB, DELETE_TRAINEE_SUB } from './subscription';
 import { GET_TRAINEE } from './query';
 import {
   AddDialog, EditDialog, RemoveDialog,
@@ -36,6 +37,52 @@ class TraineeList extends React.Component {
       rowData: {},
       rowsPerPage: 20,
     };
+  }
+
+  componentDidMount = () => {
+    const { data: { subscribeToMore } } = this.props;
+    subscribeToMore({
+      document: UPDATE_TRAINEE_SUB,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData) return prev;
+        const { getAllTrainee: { records } } = prev;
+        const { data: { traineeUpdated } } = subscriptionData;
+        const updatedRecords = [...records].map((record) => {
+          if (record.originalId === traineeUpdated.originalId) {
+            return {
+              ...record,
+              ...traineeUpdated,
+            };
+          }
+          return record;
+        });
+        return {
+          getAllTrainee: {
+            ...prev.getAllTrainee,
+            count: prev.getAllTrainee.count,
+            records: updatedRecords,
+          },
+        };
+      },
+    });
+    subscribeToMore({
+      document: DELETE_TRAINEE_SUB,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData) return prev;
+        const { getAllTrainee: { records, count } } = prev;
+        const { data: { traineeDeleted } } = subscriptionData;
+        const updateRecords = [...records].filter(
+          (record) => traineeDeleted !== record.originalId,
+        );
+        return {
+          getAllTrainee: {
+            ...prev.getAllTrainee,
+            count: count - 1,
+            records: updateRecords,
+          },
+        };
+      },
+    });
   }
 
   handleOpen = () => {
@@ -76,7 +123,6 @@ class TraineeList extends React.Component {
       this.setState({ editOpen: false });
       return response;
     } catch (error) {
-      console.log(error);
       this.handleSnackBar('There is an Error!', 'error');
     }
   }
@@ -100,6 +146,7 @@ class TraineeList extends React.Component {
         },
       } = this.props;
       const response = await deleteTrainee({ variables: { id: originalId } });
+      console.log('response of delete', response);
       if (count - page * rowsPerPage === 1 && page > 0) {
         this.setState({ page: page - 1 }, () => {
           const { page: updatePage } = this.state;
@@ -161,16 +208,15 @@ class TraineeList extends React.Component {
       rowsPerPage,
     } = this.state;
     const variables = { skip: page * rowsPerPage, limit: rowsPerPage };
+    console.log('value of variables', variables);
     const getDateFormatted = (date) => moment(date).format('dddd,MMMM Do YYYY, h:mm:ss a');
     return (
       <Mutation
         mutation={DELETE_TRAINEE}
-        refetchQueries={[{ query: GET_TRAINEE, variables }]}
       >
         {(deleteTrainee) => (
           <Mutation
             mutation={UPDATE_TRAINEE}
-            refetchQueries={[{ query: GET_TRAINEE, variables }]}
           >
             {(updateTrainee) => (
               <Mutation

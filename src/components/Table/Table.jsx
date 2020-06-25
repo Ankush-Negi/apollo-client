@@ -159,9 +159,7 @@ const TableComponent = (props) => {
           <TableBody>
             {
               loader ? (
-                <Box paddingLeft={72}>
-                  <CircularProgress />
-                </Box>
+                <center><CircularProgress /></center>
               ) : (tableBody)
             }
           </TableBody>
