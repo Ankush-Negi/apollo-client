@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button Component should render correctly 1`] = `
+<Button
+  color="primary"
+  disabled={false}
+  style={Object {}}
+  value="Submit"
+>
+  <styled.button
+    color="primary"
+    disabled={false}
+    id="Button1"
+    style={Object {}}
+    value="Submit"
+  >
+    <button
+      className="sc-AxjAm gWioyM"
+      color="primary"
+      disabled={false}
+      id="Button1"
+      style={Object {}}
+      value="Submit"
+    >
+      <b>
+        Submit
+      </b>
+    </button>
+  </styled.button>
+</Button>
+`;
