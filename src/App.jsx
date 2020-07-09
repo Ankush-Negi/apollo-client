@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ApolloProvider } from '@apollo/react-components';
 import { MuiThemeProvider, CssBaseline } from '@material-ui/core';
@@ -12,7 +11,6 @@ import {
 import { AuthLayoutRoute, PrivateLayoutRoute } from './routes/index';
 import { SnackBarProvider } from './contexts';
 import client from './lib/apollo-client';
-
 
 function App() {
   return (

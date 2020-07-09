@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SnackBar Component should render correctly 1`] = `
+<SnackBarProvider
+  message="All Good"
+  onClose="close"
+  open="true"
+  status="running"
+>
+  <Snackbars
+    message=""
+    onClose={[Function]}
+    open={false}
+    status=""
+  >
+    <div>
+      <WithStyles(ForwardRef(Snackbar))
+        autoHideDuration={5000}
+        onClose={[Function]}
+        open={false}
+      >
+        <ForwardRef(Snackbar)
+          autoHideDuration={5000}
+          classes={
+            Object {
+              "anchorOriginBottomCenter": "MuiSnackbar-anchorOriginBottomCenter",
+              "anchorOriginBottomLeft": "MuiSnackbar-anchorOriginBottomLeft",
+              "anchorOriginBottomRight": "MuiSnackbar-anchorOriginBottomRight",
+              "anchorOriginTopCenter": "MuiSnackbar-anchorOriginTopCenter",
+              "anchorOriginTopLeft": "MuiSnackbar-anchorOriginTopLeft",
+              "anchorOriginTopRight": "MuiSnackbar-anchorOriginTopRight",
+              "root": "MuiSnackbar-root",
+            }
+          }
+          onClose={[Function]}
+          open={false}
+        />
+      </WithStyles(ForwardRef(Snackbar))>
+    </div>
+  </Snackbars>
+</SnackBarProvider>
+`;

@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button Component should render correctly 1`] = `
+<TextField
+  error=""
+>
+  <styled.input
+    type="text"
+  >
+    <input
+      className="sc-AxjAm imxerM"
+      type="text"
+    />
+  </styled.input>
+  <br />
+</TextField>
+`;

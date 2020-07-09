@@ -14,5 +14,4 @@ const withLoaderAndMessage = (WrappedComponent) => function NewComponenet(props)
   return (<WrappedComponent loader={loader} dataLength={dataLength} {...rest} />);
 };
 
-
 export default withLoaderAndMessage;

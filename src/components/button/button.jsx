@@ -9,6 +9,7 @@ export default function Button(props) {
   return (
     <>
       <Buttons
+        id="Button1"
         value={value}
         disabled={disabled}
         style={style}

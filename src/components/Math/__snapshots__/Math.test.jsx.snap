@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BMath Component should render correctly 1`] = `
+<MathDemo
+  first={10}
+  operator="+"
+  second={20}
+>
+  <h4>
+    10
+     
+    +
+     
+    20
+     
+    =
+     
+    30
+  </h4>
+</MathDemo>
+`;
